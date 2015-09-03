@@ -1,29 +1,25 @@
-"""
-
-"""
+# noinspection PyAttributeOutsideInit
 class PID(object):
     """
     Discrete PID control
     """
 
-    def __init__(self, gains, derivator=0, integrator=0, integrator_max=500, integrator_min=-500):
+    def __init__(self, gains=0, derivator=0, integrator=0, integrator_max=500, 
+                 integrator_min=-500, set_point_max=1, set_point_min=-1):
 
-        self.Kp = gains.p
-        self.Ki = gains.i
-        self.Kd = gains.d
-        self.Derivator = derivator
-        self.Integrator = integrator
-        self.Integrator_max = integrator_max
-        self.Integrator_min = integrator_min
-
+        self.Kp = 0
+        self.Ki = 0
+        self.Kd = 0
+        self.integrator_max = integrator_max
+        self.integrator_min = integrator_min        
+        self.derivator = derivator
+        self.integrator = integrator
         self.P_value = 0
         self.I_value = 0
         self.D_value = 0
-
-        self.Derivator = 0
-        self.Integrator = 0
-
-        self.set_point = gains.set
+        self.set_point_max = set_point_max
+        self.set_point_min = set_point_min
+        self.set_point = 0
         self.error = 0.0
 
     def update(self, current_value):
@@ -39,40 +35,11 @@ class PID(object):
 
         self.Integrator += self.error
 
-        # @todo: can probably use the property setters/getters to implement this saturation
-        if self.Integrator > self.Integrator_max:
-            self.Integrator = self.Integrator_max
-        elif self.Integrator < self.Integrator_min:
-            self.Integrator = self.Integrator_min
-
         self.I_value = self.Integrator * self.Ki
 
         pid = self.P_value + self.I_value + self.D_value
 
         return pid
-
-    def set_point(self, set_point):
-        """
-        Initilize the setpoint of PID
-        :param set_point:
-        """
-        self.set_point = set_point
-        self.Integrator = 0
-        self.Derivator = 0
-
-    def set_integrator(self, Integrator):
-        """
-
-        :param Integrator:
-        """
-        self.Integrator = Integrator
-
-    def set_derivator(self, Derivator):
-        """
-
-        :param Derivator:
-        """
-        self.Derivator = Derivator
 
     def set_kp(self, P):
         """
@@ -96,17 +63,52 @@ class PID(object):
         self.Kd = D
 
     @property
-    def get_point(self):
-        return self.set_point
+    def set_point(self):
+        return self._set_point
+
+    @set_point.setter
+    def set_point(self, set_point):
+        """
+        Initilize the setpoint of PID
+        :param set_point:
+        """
+        if set_point > self.set_point_max:
+            self._set_point = self.set_point_max
+        elif set_point < self.set_point_min:
+            self._set_point = self.set_point_min
+        else:
+            self._set_point = set_point
+        self.Integrator = 0
+        self.Derivator = 0
 
     @property
-    def get_error(self):
-        return self.error
+    def integrator(self):
+        return self._integrator
 
-    @property
-    def get_integrator(self):
-        return self.Integrator
+    @integrator.setter
+    def integrator(self, integrator):
+        """
 
+        :param Integrator:
+        """
+        if integrator > self.integrator_max:
+            self._integrator = self.integrator_max
+        elif integrator < self.integrator_min:
+            self._integrator = self.integrator_min
+        else:
+            self._integrator = integrator
+
+            
     @property
-    def get_derivator(self):
-        return self.Derivator
+    def derivator(self):
+        return self._derivator
+
+    @derivator.setter
+    def derivator(self, derivator):
+        """
+
+        :param Derivator:
+        """
+        self._derivator = derivator
+
+
