@@ -21,7 +21,7 @@ def recv_data():
     else:
         version = (2, 7, 0, 0)  # the latest SDK version
 
-    dsock = rx.mkdatasock()
+    dsock = rx.mkdatasock(multicast_address='224.102.224.255', port=1511)
     count = 0
     #while count < max_count:
     data = dsock.recv(rx.MAX_PACKETSIZE)
@@ -44,3 +44,5 @@ def recv_data():
         #count += 1
     return contortion
 
+while(1):
+    recv_data()
