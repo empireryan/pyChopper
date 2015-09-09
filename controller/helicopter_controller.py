@@ -1,6 +1,6 @@
 from control_outputs.arduino_out import Serial
 #from controller import pitch_control, roll_control, yaw_control, thrust_control
-from optitrack_feedback import motive_client as optitrack
+from optitrack_feedback import optitrack_feedback as optitrack
 from pid import PID
 from collections import namedtuple
 
@@ -56,15 +56,14 @@ class HelicopterController(object):
         self.controllers = [self.pitch_controller, self.roll_controller, self.yaw_controller, self.thrust_controller]
 
     def update_controllers(self):
-        #results = [pid.update(state) for pid in self.controllers]
-        pass
+        results = [pid.update(state) for pid in self.controllers]
 
 
 reference = Reference(x=0, y=1, z=0, yaw=0)
 pitch_gains = Configurator(p=0, i=0, d=0, set=0)
 roll_gains = Configurator(p=0, i=0, d=0, set=0)
-yaw_gains = Configurator(p=0, i=0, d=0, set=0)
-thrust_gains = Configurator(p=0, i=0, d=0, set=0)
+yaw_gains = Configurator(p=20, i=1, d=1, set=147)  # Note, set has been set for PCTx, will likely need to modify
+thrust_gains = Configurator(p=.1, i=.01, d=.05, set=0)
 
 # Instantiate a PID controlled helicopter object
 chopper = HelicopterController(reference, pitch_gains, roll_gains, yaw_gains, thrust_gains)
@@ -79,7 +78,7 @@ Serial(115200)
 while 1:
 
     # get state
-    state = optitrack.recv_data()
+    state = optitrack.update_feedback()
     # run PID
     pid_outputs = chopper.update_controllers(state)
     # update outputs with results of PIDs, where 'pid_outputs' is an array containing

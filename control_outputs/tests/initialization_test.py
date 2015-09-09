@@ -1,13 +1,13 @@
-import serial  # if you have not already done so
 import struct
 import time
+import serial
 
 class Serial(object):
     """
     Serial Class for communication with the Arduino, and hence the RC and vehicle
     """
     num_channels = 3
-    def __init__(self, baud=115200, com_port='/dev/tty.usbmodem1411'):
+    def __init__(self, baud=115200, com_port='COM3'):
         self.serial = serial.Serial(com_port, baud)
         self.num_ppm_channels = 6
         time.sleep(2)  # wait for Arduino; yucky, but it must be done
@@ -22,7 +22,7 @@ class Serial(object):
         #for elem in ppm_array:
         self.serial.write(str(ppm_array).encode('utf-8'))
 
-ppmValues = [1000, 2000, 3000, 3000, 2000, 1000]
+ppmValues = [1500, 1500, 1500, 1500, 1500, 1500]
 
 mySerial = Serial()
 received = None
